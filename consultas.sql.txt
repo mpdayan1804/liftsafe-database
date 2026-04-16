@@ -1,0 +1,173 @@
+-- Consulta para ver todos los inspectores
+SELECT 
+    id_usuario,
+    nombre_completo,
+    correo,
+    telefono,
+    estado
+FROM usuario
+WHERE id_rol = 4;
+
+-- Programación de inspecciones para la próxima semana (lunes a viernes)
+-- Ajusta las fechas según la semana actual
+
+SELECT 
+    p.id_programacion,
+    p.fecha_programada,
+    p.hora_inicio,
+    p.hora_fin_estimada,
+    u.nombre_completo AS inspector,
+    u.correo AS email_inspector,
+    u.telefono AS telefono_inspector,
+    a.codigo_interno,
+    a.marca,
+    a.modelo,
+    a.ubicacion_exacta,
+    a.direccion_completa,
+    a.ciudad,
+    c.nombre_completo AS cliente,
+    s.tipo_servicio,
+    s.prioridad,
+    s.observaciones,
+    p.estado AS estado_programacion
+FROM programacion p
+INNER JOIN usuario u ON p.id_inspector = u.id_usuario
+INNER JOIN solicitud s ON p.id_solicitud = s.id_solicitud
+INNER JOIN ascensor a ON s.id_ascensor = a.id_ascensor
+INNER JOIN usuario c ON s.id_cliente = c.id_usuario
+WHERE u.id_rol = 4  -- Inspectores
+  AND u.estado = 'activo'
+  AND p.estado NOT IN ('Cancelada')  -- Excluir canceladas
+  AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'  -- Próxima semana (ajustar)
+ORDER BY p.fecha_programada, p.hora_inicio, u.nombre_completo;
+
+-- Resumen de horas programadas por inspector para la próxima semana
+SELECT 
+    u.id_usuario,
+    u.nombre_completo AS inspector,
+    COUNT(p.id_programacion) AS total_inspecciones,
+    ROUND(SUM(TIMESTAMPDIFF(HOUR, p.hora_inicio, p.hora_fin_estimada)), 1) AS horas_programadas,
+    -- Horas disponibles (8 horas/día * 5 días = 40 horas)
+    40 - ROUND(SUM(TIMESTAMPDIFF(HOUR, p.hora_inicio, p.hora_fin_estimada)), 1) AS horas_disponibles,
+    -- Porcentaje de ocupación
+    ROUND((SUM(TIMESTAMPDIFF(HOUR, p.hora_inicio, p.hora_fin_estimada)) / 40) * 100, 1) AS porcentaje_ocupacion
+FROM programacion p
+INNER JOIN usuario u ON p.id_inspector = u.id_usuario
+INNER JOIN solicitud s ON p.id_solicitud = s.id_solicitud
+WHERE u.id_rol = 4 
+  AND u.estado = 'activo'
+  AND p.estado NOT IN ('Cancelada')
+  AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+GROUP BY u.id_usuario, u.nombre_completo
+ORDER BY horas_programadas DESC;
+
+-- Programación organizada por día e inspector
+SELECT 
+    DAYNAME(p.fecha_programada) AS dia_semana,
+    p.fecha_programada,
+    p.hora_inicio,
+    p.hora_fin_estimada,
+    u.nombre_completo AS inspector,
+    a.codigo_interno,
+    CONCAT(a.marca, ' ', a.modelo) AS ascensor,
+    CONCAT(a.ciudad, ' - ', a.direccion_completa) AS ubicacion,
+    s.tipo_servicio,
+    CASE 
+        WHEN TIMESTAMPDIFF(HOUR, p.hora_inicio, p.hora_fin_estimada) <= 2 THEN 'Corta'
+        WHEN TIMESTAMPDIFF(HOUR, p.hora_inicio, p.hora_fin_estimada) <= 4 THEN 'Media'
+        ELSE 'Larga'
+    END AS duracion_estimada
+FROM programacion p
+INNER JOIN usuario u ON p.id_inspector = u.id_usuario
+INNER JOIN solicitud s ON p.id_solicitud = s.id_solicitud
+INNER JOIN ascensor a ON s.id_ascensor = a.id_ascensor
+WHERE u.id_rol = 4 
+  AND u.estado = 'activo'
+  AND p.estado = 'Programada'  -- Solo programadas (no finalizadas)
+  AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+ORDER BY p.fecha_programada, p.hora_inicio, u.nombre_completo;
+
+-- Encuentra espacios disponibles en la agenda de cada inspector
+-- Muestra horas libres entre inspecciones programadas
+
+WITH horas_trabajo AS (
+    SELECT 
+        u.id_usuario,
+        u.nombre_completo,
+        p.fecha_programada,
+        p.hora_inicio,
+        p.hora_fin_estimada,
+        LAG(p.hora_fin_estimada) OVER (PARTITION BY u.id_usuario, p.fecha_programada ORDER BY p.hora_inicio) AS ultima_fin
+    FROM programacion p
+    INNER JOIN usuario u ON p.id_inspector = u.id_usuario
+    WHERE u.id_rol = 4 
+      AND u.estado = 'activo'
+      AND p.estado NOT IN ('Cancelada')
+      AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+)
+SELECT 
+    nombre_completo AS inspector,
+    fecha_programada,
+    'Espacio libre' AS tipo,
+    ultima_fin AS hora_inicio_libre,
+    hora_inicio AS hora_fin_libre,
+    TIMEDIFF(hora_inicio, ultima_fin) AS duracion_libre
+FROM horas_trabajo
+WHERE ultima_fin IS NOT NULL 
+  AND TIMEDIFF(hora_inicio, ultima_fin) > '01:00:00'  -- Espacios mayores a 1 hora
+ORDER BY fecha_programada, hora_inicio_libre;
+
+-- Reporte completo para exportar a Excel/CSV
+SELECT 
+    p.id_programacion AS 'ID Programación',
+    DATE_FORMAT(p.fecha_programada, '%d/%m/%Y') AS 'Fecha',
+    DAYNAME(p.fecha_programada) AS 'Día',
+    TIME_FORMAT(p.hora_inicio, '%H:%i') AS 'Hora Inicio',
+    TIME_FORMAT(p.hora_fin_estimada, '%H:%i') AS 'Hora Fin',
+    TIMESTAMPDIFF(HOUR, p.hora_inicio, p.hora_fin_estimada) AS 'Horas',
+    u.nombre_completo AS 'Inspector',
+    u.telefono AS 'Teléfono Inspector',
+    a.codigo_interno AS 'Código Ascensor',
+    CONCAT(a.marca, ' ', a.modelo) AS 'Marca/Modelo',
+    a.ciudad AS 'Ciudad',
+    a.direccion_completa AS 'Dirección',
+    c.nombre_completo AS 'Cliente',
+    s.tipo_servicio AS 'Tipo Servicio',
+    s.prioridad AS 'Prioridad',
+    p.estado AS 'Estado'
+FROM programacion p
+INNER JOIN usuario u ON p.id_inspector = u.id_usuario
+INNER JOIN solicitud s ON p.id_solicitud = s.id_solicitud
+INNER JOIN ascensor a ON s.id_ascensor = a.id_ascensor
+INNER JOIN usuario c ON s.id_cliente = c.id_usuario
+WHERE u.id_rol = 4 
+  AND u.estado = 'activo'
+  AND p.estado IN ('Programada', 'Finalizada')
+  AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+ORDER BY p.fecha_programada, p.hora_inicio, u.nombre_completo;
+
+-- Consulta dinámica que calcula automáticamente la próxima semana
+SET @next_monday = DATE_ADD(CURDATE(), INTERVAL (9 - DAYOFWEEK(CURDATE())) DAY);
+SET @next_friday = DATE_ADD(@next_monday, INTERVAL 4 DAY);
+
+SELECT 
+    p.id_programacion,
+    p.fecha_programada,
+    p.hora_inicio,
+    p.hora_fin_estimada,
+    u.nombre_completo AS inspector,
+    a.codigo_interno,
+    a.marca,
+    a.modelo,
+    s.tipo_servicio
+FROM programacion p
+INNER JOIN usuario u ON p.id_inspector = u.id_usuario
+INNER JOIN solicituid_ascensord s ON p.id_solicitud = s.id_solicitud
+INNER JOIN ascensor a ON s.id_ascensor = a.id_ascensor
+WHERE u.id_rol = 4 
+  AND u.estado = 'activo'
+  AND p.estado = 'Programada'
+  AND p.fecha_programada BETWEEN @next_monday AND @next_friday
+ORDER BY p.fecha_programada, p.hora_inicio;
+
+
