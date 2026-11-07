@@ -1,7 +1,7 @@
 -- =====================================================
 -- REPORTE DE PROGRAMACIÓN SEMANAL
--- INSPECTORES: 6 (jornada de 8 horas, lunes a viernes)
--- SEMANA: 15 AL 19 DE ABRIL DE 2026
+-- INSPECTORES ACTIVOS (jornada de 8 horas, lunes a viernes)
+-- SEMANA: 13 AL 17 DE ABRIL DE 2026
 -- =====================================================
 
 USE liftsafe_db;
@@ -33,7 +33,7 @@ INNER JOIN usuario c ON s.id_cliente = c.id_usuario
 WHERE u.id_rol = 4 
   AND u.estado = 'activo'
   AND p.estado = 'Programada'
-  AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+  AND p.fecha_programada BETWEEN '2026-04-13' AND '2026-04-17'
 ORDER BY p.fecha_programada, p.hora_inicio, u.nombre_completo;
 
 -- =====================================================
@@ -52,7 +52,7 @@ INNER JOIN usuario u ON p.id_inspector = u.id_usuario
 WHERE u.id_rol = 4 
   AND u.estado = 'activo'
   AND p.estado = 'Programada'
-  AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+  AND p.fecha_programada BETWEEN '2026-04-13' AND '2026-04-17'
 GROUP BY u.id_usuario, u.nombre_completo
 ORDER BY `Horas Programadas` DESC;
 
@@ -69,7 +69,7 @@ SELECT
     ROUND(AVG(TIMESTAMPDIFF(HOUR, p.hora_inicio, p.hora_fin_estimada)), 1) AS 'Promedio Horas x Inspección'
 FROM programacion p
 WHERE p.estado = 'Programada'
-  AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+  AND p.fecha_programada BETWEEN '2026-04-13' AND '2026-04-17'
 GROUP BY p.fecha_programada
 ORDER BY p.fecha_programada;
 
@@ -94,7 +94,7 @@ INNER JOIN ascensor a ON s.id_ascensor = a.id_ascensor
 WHERE u.id_rol = 4 
   AND u.estado = 'activo'
   AND p.estado = 'Programada'
-  AND p.fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+  AND p.fecha_programada BETWEEN '2026-04-13' AND '2026-04-17'
 ORDER BY p.fecha_programada, p.hora_inicio;
 
 -- =====================================================
@@ -106,7 +106,7 @@ SELECT
     COUNT(*) AS cantidad_programaciones,
     COUNT(DISTINCT id_inspector) AS cantidad_inspectores
 FROM programacion
-WHERE fecha_programada BETWEEN '2026-04-15' AND '2026-04-19'
+WHERE fecha_programada BETWEEN '2026-04-13' AND '2026-04-17'
   AND estado = 'Programada'
 GROUP BY fecha_programada
 ORDER BY fecha_programada;

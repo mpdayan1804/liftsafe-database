@@ -496,7 +496,19 @@ INSERT INTO `programacion` (`id_programacion`, `id_solicitud`, `id_inspector`, `
 (18, 18, 5, '2025-03-05', '09:00:00', '11:00:00', 'Programada', NULL, '2026-03-08 22:12:27', '2026-03-08 22:12:27'),
 (19, 19, 6, '2025-03-06', '07:00:00', '09:00:00', 'Programada', NULL, '2026-03-08 22:12:27', '2026-03-08 22:12:27'),
 (20, 20, 8, '2025-02-27', '06:00:00', '07:30:00', 'Finalizada', NULL, '2026-03-08 22:12:27', '2026-03-08 22:12:27'),
-(24, 22, 4, '2026-04-06', '08:00:00', '10:30:00', 'Programada', NULL, '2026-04-06 12:50:13', '2026-04-06 12:50:13');
+(24, 22, 4, '2026-04-06', '08:00:00', '10:30:00', 'Programada', NULL, '2026-04-06 12:50:13', '2026-04-06 12:50:13'),
+(25, 5, 4, '2026-04-13', '08:00:00', '10:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(26, 8, 5, '2026-04-13', '09:00:00', '11:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(27, 11, 6, '2026-04-13', '13:00:00', '15:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(28, 14, 8, '2026-04-14', '08:00:00', '10:30:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(29, 15, 4, '2026-04-14', '13:00:00', '15:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(30, 18, 5, '2026-04-15', '08:00:00', '10:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(31, 23, 6, '2026-04-15', '10:30:00', '12:30:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(32, 1, 8, '2026-04-16', '08:00:00', '10:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(33, 3, 4, '2026-04-16', '14:00:00', '16:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(34, 7, 5, '2026-04-17', '08:00:00', '10:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(35, 9, 6, '2026-04-17', '09:00:00', '11:00:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00'),
+(36, 13, 8, '2026-04-17', '13:00:00', '15:30:00', 'Programada', NULL, '2026-04-10 14:00:00', '2026-04-10 14:00:00');
 
 -- --------------------------------------------------------
 
@@ -521,8 +533,7 @@ INSERT INTO `rol` (`id_rol`, `nombre_rol`, `descripcion`, `fecha_creacion`) VALU
 (3, 'Coordinador', 'Programa inspecciones, asigna inspectores y revisa informes', '2025-01-10 13:00:00'),
 (4, 'Inspector', 'Ejecuta inspecciones en campo, diligencia checklist y firma informes', '2025-01-10 13:00:00'),
 (5, 'Asesor', 'Gestión comercial, atención al cliente y seguimiento de contratos', '2025-01-10 13:00:00'),
-(6, 'Cliente', 'Consulta estado de sus ascensores e informes de inspección', '2025-01-10 13:00:00'),
-(8, 'RolEditadoExitoso', 'Este rol fue editado correctamente', '2026-04-01 02:54:50');
+(6, 'Cliente', 'Consulta estado de sus ascensores e informes de inspección', '2025-01-10 13:00:00');
 
 -- --------------------------------------------------------
 
@@ -853,7 +864,7 @@ ALTER TABLE `observacion`
 -- AUTO_INCREMENT de la tabla `programacion`
 --
 ALTER TABLE `programacion`
-  MODIFY `id_programacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_programacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
