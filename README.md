@@ -10,7 +10,7 @@ Base de datos relacional para **LiftSafe**, un sistema que gestiona el ciclo com
 - **Modelado relacional** de un proceso de negocio real: 14 tablas normalizadas y 21 llaves foráneas con reglas `ON DELETE CASCADE` / `SET NULL`.
 - **Control de acceso por roles**: Administrador, Director Técnico, Coordinador, Inspector, Asesor y Cliente.
 - **Trazabilidad**: tabla `auditoria` que guarda la acción, el valor anterior y el nuevo en JSON, la IP y el navegador.
-- **Datos de prueba realistas**: 35 usuarios, 22 ascensores, 22 solicitudes e inspecciones, 21 programaciones e informes.
+- **Datos de prueba realistas**: 35 usuarios, 22 ascensores, 22 solicitudes e inspecciones, 33 programaciones (incluye una semana completa para el reporte) y 21 informes.
 - **Consultas analíticas** con `JOIN` de varias tablas, `GROUP BY`, funciones de fecha (`DATE_FORMAT`, `DAYNAME`, `TIMESTAMPDIFF`) y cálculo de ocupación de inspectores.
 
 ## Modelo de datos
