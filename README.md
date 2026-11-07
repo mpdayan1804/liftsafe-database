@@ -54,8 +54,8 @@ erDiagram
 Requisitos: MySQL 8 o MariaDB 10.4+ (el volcado se generó con phpMyAdmin / XAMPP).
 
 ```bash
-git clone https://github.com/mpdayan1804/liftsafe-database1.git
-cd liftsafe-database1
+git clone https://github.com/mpdayan1804/liftsafe-database.git
+cd liftsafe-database
 
 mysql -u root -p -e "CREATE DATABASE liftsafe_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -u root -p liftsafe_db < liftsafe_db_completa.sql
